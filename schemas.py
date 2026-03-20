@@ -1,11 +1,29 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field, validator
+import re
 
 class UserCreate(BaseModel):
-    name: str
-    email: str
+    name: str = Field(min_length=2, max_length=50)
+    email: EmailStr
     password: str
 
+    @validator("password")
+    def validate_password(cls, v):
+        if len(v) < 8:
+            raise ValueError("Password too short")
+        if not re.search(r"[A-Z]", v):
+            raise ValueError("Must include uppercase letter")
+        if not re.search(r"[0-9]", v):
+            raise ValueError("Must include number")
+        return v
+
 class UserLogin(BaseModel):
-    email: str
+    email: EmailStr
     password: str
-    
+
+class UserResponse(BaseModel):
+    id: int
+    name: str
+    email: EmailStr
+
+    class Config:
+        from_attributes = True
