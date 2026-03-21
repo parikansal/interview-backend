@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, validator
+from pydantic import BaseModel, EmailStr, Field, field_validator
 import re
 
 class UserCreate(BaseModel):
@@ -6,7 +6,8 @@ class UserCreate(BaseModel):
     email: EmailStr
     password: str
 
-    @validator("password")
+    @field_validator("password")
+    @classmethod
     def validate_password(cls, v):
         if len(v) < 8:
             raise ValueError("Password too short")
@@ -25,5 +26,4 @@ class UserResponse(BaseModel):
     name: str
     email: EmailStr
 
-    class Config:
-        from_attributes = True
+    model_config = {"from_attributes": True}
